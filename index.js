@@ -1,3 +1,8 @@
+// POSTMESSAGE
+window.addEventListener("message", function (event) {
+  console.log("POSTMESSAGE: Message received from the parent: " + event.data); // Message received from parent
+});
+
 // window.onload = function () {
 var svgNS = "http://www.w3.org/2000/svg";
 
