@@ -17,10 +17,17 @@ const svg = document
 const output = document.querySelector(".output");
 const iframe = document.getElementById("difDomain");
 const iframe2 = document.getElementById("difDomain2");
-
+const iframeButton = document.getElementById("iframeButton");
+const iframe2Button = document.getElementById("iframe2Button");
 // Wait for the iframe to load
 iframe.addEventListener("load", onLoad);
 iframe2.addEventListener("load", onLoad2);
+iframeButton.addEventListener("click", () => {
+  sendMessage({ a: 2 });
+});
+iframe2Button.addEventListener("click", () => {
+  sendMessage2({ a: 2 });
+});
 
 function onLoad() {
   iframe.contentWindow.postMessage(
@@ -34,4 +41,12 @@ function onLoad2() {
     "MESSAGECHANNEL: Hello to iframe2 from the main page!",
     "*"
   );
+}
+
+function sendMessage(data) {
+  iframe.contentWindow.postMessage(JSON.stringify(data), "*");
+}
+
+function sendMessage2(data) {
+  iframe2.contentWindow.postMessage(JSON.stringify(data), "*");
 }
