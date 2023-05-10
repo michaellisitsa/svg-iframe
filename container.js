@@ -23,22 +23,38 @@ const iframe2Button = document.getElementById("iframe2Button");
 iframe.addEventListener("load", onLoad);
 iframe2.addEventListener("load", onLoad2);
 iframeButton.addEventListener("click", () => {
-  sendMessage({ a: 2 });
+  sendMessage({ method: "render", type: "result", a: 2 });
 });
 iframe2Button.addEventListener("click", () => {
-  sendMessage2({ a: 2 });
+  sendMessage2({ method: "render", type: "result", value: { a: 2 } });
 });
 
 function onLoad() {
   iframe.contentWindow.postMessage(
-    "MESSAGECHANNEL: Hello to iframe from the main page!",
+    JSON.stringify({
+      method: "getCapabilities",
+    }),
+    "*"
+  );
+  iframe.contentWindow.postMessage(
+    JSON.stringify({
+      method: "arguments",
+    }),
     "*"
   );
 }
 
 function onLoad2() {
   iframe2.contentWindow.postMessage(
-    "MESSAGECHANNEL: Hello to iframe2 from the main page!",
+    JSON.stringify({
+      method: "getCapabilities",
+    }),
+    "*"
+  );
+  iframe2.contentWindow.postMessage(
+    JSON.stringify({
+      method: "arguments",
+    }),
     "*"
   );
 }

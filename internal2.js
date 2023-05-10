@@ -1,6 +1,34 @@
+(function () {
+  window.ccInterface = {
+    render: function (methodArguments) {
+      console.log("data given is: ", methodArguments);
+    },
+    arguments: function (methodArguments) {
+      console.log("Arguments are: ", { a: "string", b: "number" });
+    },
+  };
+})();
+
 // POSTMESSAGE
 window.addEventListener("message", function (event) {
-  console.log("POSTMESSAGE: Message received from the parent: " + event.data); // Message received from parent
+  // console.log("POSTMESSAGE: Message received from the parent: " + event.data); // Message received from parent
+  // TODO: Why don't need to stringify.
+  let methodArguments;
+  try {
+    methodArguments = JSON.parse(event.data);
+  } catch (e) {
+    console.error("Could not parse json", e);
+  }
+  const method = methodArguments.method;
+  const methodCallback = window.ccInterface[method];
+
+  if (method === "getCapabilities") {
+    console.log("Available methods", Object.keys(window.ccInterface));
+  } else if (method === "render" || method === "arguments") {
+    methodCallback.apply(null, methodArguments);
+  } else {
+    console.error("Method not found", e);
+  }
 });
 
 // window.onload = function () {
@@ -9,7 +37,7 @@ var svgNS = "http://www.w3.org/2000/svg";
 function draw(node, args = { a: 1, b: 3 }, options = {}) {
   // Need to use svg namespace
   function generateRect(X, Y, width, height, style) {
-    newRectEl = document.createElementNS(svgNS, "rect");
+    const newRectEl = document.createElementNS(svgNS, "rect");
     newRectEl.setAttribute("x", X);
     newRectEl.setAttribute("y", Y);
     newRectEl.setAttribute("width", width);
