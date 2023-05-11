@@ -30,3 +30,18 @@ window.addEventListener("message", function (event) {
     console.error("Method not found", e);
   }
 });
+// const elementToShare = document.getElementById("elementToShare");
+const elementToShare = document.body;
+function shareHTMLElement() {
+  html2canvas(elementToShare, {
+    grabMouse: false, //---- if you don't want to take mouse icon
+    onrendered: function (canvas) {
+      console.log("rendered called");
+      console.log("type of canvas", canvas);
+      document.body.appendChild(canvas);
+      console.log("canvas", canvas.toDataURL("image/webp", 1));
+    },
+    ignoreElements: "OBJECT|PARAM",
+    svgRendering: true,
+  });
+}
