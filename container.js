@@ -23,10 +23,26 @@ const iframe2Button = document.getElementById("iframe2Button");
 iframe.addEventListener("load", onLoad);
 iframe2.addEventListener("load", onLoad2);
 iframeButton.addEventListener("click", () => {
-  sendMessage({ method: "render", type: "result", a: 2 });
+  sendMessage({
+    method: "render",
+    type: "result",
+    value: {
+      a: 2,
+      b: 3,
+      color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+    },
+  });
 });
 iframe2Button.addEventListener("click", () => {
-  sendMessage2({ method: "render", type: "result", value: { a: 2 } });
+  sendMessage2({
+    method: "render",
+    type: "result",
+    value: {
+      a: 100 * Math.random(),
+      b: 3,
+      color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+    },
+  });
 });
 
 function onLoad() {

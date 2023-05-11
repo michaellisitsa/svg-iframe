@@ -2,9 +2,14 @@
   window.ccInterface = {
     render: function (methodArguments) {
       console.log("data given is: ", methodArguments);
+      draw(canvasSVG, (args = methodArguments.value));
     },
     arguments: function (methodArguments) {
-      console.log("Arguments are: ", { a: "string", b: "number" });
+      console.log("Arguments are: ", {
+        a: "string",
+        b: "number",
+        color: "string",
+      });
     },
   };
 })();
@@ -25,16 +30,20 @@ window.addEventListener("message", function (event) {
   if (method === "getCapabilities") {
     console.log("Available methods", Object.keys(window.ccInterface));
   } else if (method === "render" || method === "arguments") {
-    methodCallback.apply(null, methodArguments);
+    try {
+      methodCallback.apply(null, [methodArguments]);
+    } catch (e) {
+      console.error("something failed", e);
+    }
   } else {
     console.error("Method not found", e);
   }
 });
 
-// window.onload = function () {
 var svgNS = "http://www.w3.org/2000/svg";
 
-function draw(node, args = { a: 1, b: 3 }, options = {}) {
+function draw(node, args = { a: 1, b: 3, colour: "rgb(0,0,0)" }, options = {}) {
+  node.innerHTML = "";
   // Need to use svg namespace
   function generateRect(X, Y, width, height, style) {
     const newRectEl = document.createElementNS(svgNS, "rect");
@@ -51,10 +60,10 @@ function draw(node, args = { a: 1, b: 3 }, options = {}) {
     node.appendChild(
       generateRect(
         0,
-        0,
+        args.a,
         100 + 100 * i,
         100,
-        "fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)"
+        `fill:${args.color};stroke-width:3;stroke:rgb(0,0,0)`
       )
     );
   }
@@ -71,7 +80,6 @@ var canvasSVG = document.createElementNS(svgNS, "svg");
 
 canvasSVG.setAttribute("width", 200);
 canvasSVG.setAttribute("height", 200);
-canvasSVG.setAttribute("style", "display:block");
-draw(canvasSVG, (args = { a: 1, b: 2 }));
+canvasSVG.setAttribute("style", `display:block`);
+draw(canvasSVG, (args = { a: 1, b: 2, color: "rgb(0,0,0)" }));
 document.body.appendChild(canvasSVG);
-// };
