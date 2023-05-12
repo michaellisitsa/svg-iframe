@@ -1,10 +1,16 @@
 (function () {
   window.ccInterface = {
-    render: function (methodArguments) {
-      console.log("data given is: ", methodArguments);
-      draw(canvasSVG, (args = methodArguments.value));
+    render: function (callback, methodArguments) {
+      try {
+        console.log("data given is: ", methodArguments);
+        draw(canvasSVG, (args = methodArguments.value));
+        throw Error("Woops");
+        callback(null, "All good message from iframe");
+      } catch (e) {
+        callback("error", e);
+      }
     },
-    arguments: function (methodArguments) {
+    arguments: function (callback, methodArguments) {
       console.log("Arguments are: ", {
         a: "string",
         b: "number",
@@ -13,6 +19,27 @@
     },
   };
 })();
+
+// Post the jsonData back to the source frame.
+function postJSONData(jsonData) {
+  if (typeof jsonData !== "object") {
+    throw new TypeError("jsonData should be an object");
+  }
+
+  var message = JSON.stringify(jsonData);
+  // Currently send the response to the top domain (clearcalcs).
+  // Don't use the document.location.hash thing just yet.
+  window.parent.postMessage(message, "*");
+}
+
+// Generate an error in our response object.
+function generateErrorResponse(type, message) {
+  return {
+    error: true,
+    errorType: type,
+    errorText: message,
+  };
+}
 
 // POSTMESSAGE
 window.addEventListener("message", function (event) {
@@ -27,11 +54,30 @@ window.addEventListener("message", function (event) {
   const method = methodArguments.method;
   const methodCallback = window.ccInterface[method];
 
+  const referenceId = methodArguments.referenceId;
+
+  function callback(err, response) {
+    if (err) {
+      postJSONData({
+        type: "userdiagram",
+        referenceId,
+        response: generateErrorResponse(err.name, err.message),
+      });
+      return;
+    }
+
+    postJSONData({
+      type: "userdiagram",
+      referenceId,
+      response,
+    });
+  }
+
   if (method === "getCapabilities") {
     console.log("Available methods", Object.keys(window.ccInterface));
   } else if (method === "render" || method === "arguments") {
     try {
-      methodCallback.apply(null, [methodArguments]);
+      methodCallback.apply(null, [callback].concat(methodArguments));
     } catch (e) {
       console.error("something failed", e);
     }
