@@ -4,6 +4,7 @@
       try {
         console.log("data given is: ", methodArguments);
         draw(canvasSVG, (args = methodArguments.value));
+        window.alert("modal");
         throw Error("Woops");
         callback(null, "All good message from iframe");
       } catch (e) {
